@@ -57,7 +57,7 @@ fi
 # Active MQ installation dir
 if [ -z "$ACTIVEMQ_HOME" ] ; then
   # try to find ACTIVEMQ
-  ACTIVEMQ_HOME='/home/activemq/apache-activemq-5.10.0'
+  ACTIVEMQ_HOME='/home/activemq/apache-activemq-5.10.2'
 
   ## resolve links - $0 may be a link to activemq's home
   PRG="$0"
