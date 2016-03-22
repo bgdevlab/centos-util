@@ -33,14 +33,14 @@ installActiveMQ510() {
 
     lognow "checking for local $dist_archive file (this may have been copied here by PACKER)"
     if [ ! -f $dist_archive ]; then
-        wget --no-check-certificate $dist_activemq 2>&1
+        wget --no-check-certificate $dist_activemq 2>/dev/null
     else
         lognow "found local archive $dist_archive"
     fi
 
     lognow "checking for local $init_script file (this may have been copied here by PACKER)"
     if [ ! -f $init_script ]; then
-        wget --no-check-certificate $init_activemq 2>&1
+        wget --no-check-certificate $init_activemq 2>/dev/null
     else
         lognow "found local archive $init_script"
     fi
@@ -84,14 +84,14 @@ installActiveMQ58() {
 
     lognow "checking for local $dist_archive file (this may have been copied here by PACKER)"
     if [ ! -f $dist_archive ]; then
-        wget --no-check-certificate $dist_activemq 2>&1
+        wget --no-check-certificate $dist_activemq 2>/dev/null
     else
         lognow "found local archive $dist_archive"
     fi
 
     lognow "checking for local $init_script file (this may have been copied here by PACKER)"
     if [ ! -f $init_script ]; then
-        wget --no-check-certificate $init_activemq 2>&1
+        wget --no-check-certificate $init_activemq 2>/dev/null
     else
         lognow "found local archive $init_script"
     fi
@@ -136,14 +136,14 @@ installActiveMQ52() {
 
     lognow "checking for local $dist_archive file (this may have been copied here by PACKER)"
     if [ ! -f $dist_archive ]; then
-        wget --no-check-certificate $dist_activemq 2>&1
+        wget --no-check-certificate $dist_activemq 2>/dev/null
     else
         lognow "found local archive $dist_archive"        
     fi
 
     lognow "checking for local $init_script file (this may have been copied here by PACKER)"
     if [ ! -f $init_script ]; then
-        wget --no-check-certificate $init_activemq 2>&1
+        wget --no-check-certificate $init_activemq 2>/dev/null
     else
         lognow "found local archive $init_script"
     fi
