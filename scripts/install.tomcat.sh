@@ -31,14 +31,14 @@ installTomcat() {
 
     lognow "checking for local $dist_archive file"
     if [ ! -f $dist_archive ]; then
-        wget $dist_tomcat 2>&1
+        wget --no-check-certificate $dist_tomcat 2>&1
     else
         lognow "found local archive $dist_archive"
     fi
 
     lognow "checking for local $init_script file"
     if [ ! -f $init_script ]; then
-        wget $init_tomcat 2>&1
+        wget --no-check-certificate $init_tomcat 2>&1
     else
         lognow "found local archive $init_script"
     fi
