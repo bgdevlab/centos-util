@@ -1,0 +1,16 @@
+{
+  "name": "bgdevlab/centos-util",
+  "description": "CentOS utlity and build scripts",
+  "authors": [
+    {
+      "name": "theodson",
+      "email": "theodson@gmail.com"
+    }
+  ],
+  "minimum-stability": "dev",
+  "extra": {
+    "branch-alias": {
+      "dev-master": "1.0.x-dev"
+    }
+  }
+}
