@@ -59,6 +59,7 @@ installTomcat() {
         chmod +x ./configure
         ./configure
         make
+        cp jsvc ..
         chown -R tomcat:tomcat /home/tomcat
         popd;popd;
     }
