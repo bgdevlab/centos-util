@@ -1,6 +1,10 @@
 # centos-util
 CentOS utlity and build scripts, OS version 5.
 
+| Release     | Branch    | CentOS Version  |
+| ----------- | --------- | --------------- |
+| 1.0         | os/5      | CentOS 5.x      |
+| 2.0         | master    | CentOS 6.x      |
 
 ## Packages
 
