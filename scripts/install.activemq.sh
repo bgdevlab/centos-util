@@ -26,7 +26,7 @@ installActiveMQ510() {
     lognow "install activemq-$amqv application"
 
     dist_activemq="http://apache.uberglobalmirror.com/activemq/5.10.2/apache-activemq-5.10.2-bin.tar.gz"
-    init_activemq="${script_baseurl}/scripts/apache/activemq/apache-activemq-5.10.0-bin.init"
+    init_activemq="${script_baseurl}/scripts/apache/activemq/apache-activemq-5.10.2-bin.init"
 
     dist_archive=`basename "$dist_activemq"`
     init_script=`basename "$init_activemq"`
