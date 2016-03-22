@@ -23,6 +23,8 @@ installTomcat() {
     chown -R tomcat:tomcat /home/tomcat
     chmod -R 755 /home/tomcat
 
+    /etc/init.d/tomcat stop 2>/dev/null
+
     dist_tomcat="https://archive.apache.org/dist/tomcat/tomcat-6/v6.0.18/bin/apache-tomcat-6.0.18.tar.gz"
     init_tomcat="${script_baseurl}/scripts/apache/tomcat/apache-tomcat-6.0.18.init"
 
@@ -31,27 +33,27 @@ installTomcat() {
 
     lognow "checking for local $dist_archive file"
     if [ ! -f $dist_archive ]; then
-        wget --no-check-certificate $dist_tomcat 2>&1
+        curl --silent --show-error -O $dist_tomcat 2>&1
     else
         lognow "found local archive $dist_archive"
     fi
 
     lognow "checking for local $init_script file"
     if [ ! -f $init_script ]; then
-        wget --no-check-certificate $init_tomcat 2>&1
+        curl --silent --show-error -O $init_tomcat 2>&1
     else
         lognow "found local archive $init_script"
     fi
     
     # TOMCAT
     lognow "install tomcat application"
-    tar -xvf "$dist_archive" -C /home/tomcat/ 2>>$errlogfile
+    tar -xf "$dist_archive" -C /home/tomcat/ 2>>$errlogfile
     chown -R tomcat:tomcat /home/tomcat
 
     {
         # install tomcat as a service.
         pushd /home/tomcat/apache-tomcat-6.0.18/bin/
-        tar -xvf jsvc.tar.gz
+        tar -xf jsvc.tar.gz
 
         pushd /home/tomcat/apache-tomcat-6.0.18/bin/jsvc-src/
         # read /home/tomcat/apache-tomcat-6.0.18/bin/jsvc-src/INSTALL.txt
