@@ -1,0 +1,150 @@
+#!/bin/sh
+# /etc/init.d/tomcat
+#
+# Tomcat Server
+#
+# chkconfig: 345 96 30
+# description: Java servlet container
+#
+if [ -f /etc/init.d/functions ] ; then
+  . /etc/init.d/functions
+elif [ -f /etc/rc.d/init.d/functions ] ; then
+  . /etc/rc.d/init.d/functions
+else
+  exit 1
+fi
+ 
+JAVA_HOME=/usr/java/latest
+SHORTNAME="tomcat"
+SERVICENAME="apache-tomcat-6.0.18" #make sure versions match
+DISPLAYNAME="Apache Tomcat 6.0.18" #make sure versions match
+CATALINA_HOME=/home/tomcat/$SERVICENAME
+DAEMON_HOME=/home/tomcat/$SERVICENAME
+TOMCAT_USER=tomcat
+ 
+PIDFILE=/var/run/tomcat.pid
+ 
+TMP_DIR=/var/tmp
+CATALINA_TMPDIR=$CATALINA_HOME/temp
+CATALINA_OPTS="-Djava.endorsed.dirs=$CATALINA_HOME/common/endorsed"
+CLASSPATH=$CATALINA_HOME/bin/commons-daemon.jar:$CATALINA_HOME/bin/bootstrap.jar
+JSVC_BIN=$DAEMON_HOME/bin/jsvc
+ 
+PID=
+ 
+if [ ! -x ${JSVC_BIN} ]; then
+    echo -n "Cannot run ${DISPLAYNAME}, ${JSVC_BIN} not present. "
+    exit 5
+fi
+ 
+rhstatus() {
+    #
+    # Tomcat Status
+    #
+    status tomcat
+    RETVAL=$?
+    if [ $RETVAL -ne 0 ] ; then
+        return $RETVAL
+    fi
+}
+ 
+stop() {
+    #
+    # Stop Tomcat
+    #
+    # kill all tomcat instances, use session id
+    #
+    # STOPHARD ps -u tomcat -o sess= | while read line;do pkill -s $line; done
+    #
+    if [ -f "$PIDFILE" ]; then
+        PID=`cat "$PIDFILE"`
+    fi
+    TASK="stopping $SHORTNAME services ( $PID )"
+    echo -n ${TASK}
+    action `$DAEMON_HOME/bin/jsvc -stop -pidfile $PIDFILE org.apache.catalina.startup.Bootstrap`
+    RETVAL=$?
+    if [ $RETVAL -ne 0 ] ; then
+        failure "${TASK}"
+        echo
+        return $RETVAL
+    fi
+}
+ 
+start() {
+    #
+    # Start Tomcat
+    #
+    if [ -f "$PIDFILE" ]; then
+        PID=`cat "$PIDFILE"`
+        FILE_EXISTS=$?
+        # if PID found in PIDFILE
+        if [ $PID -ne 0 ] ; then
+            PARENTPID=`ps -p "$PID" -o pid=`
+            DEADCHECK=$?
+            if [ $DEADCHECK -ne 0 ] ; then
+                # If that process does NOT exist
+                `rm -f "$PIDFILE"`
+                echo_success
+                echo "starting ${SHORTNAME} services (cleaning dirty pidfile : $PID) "
+            else
+                PARENTPID=`ps -p "$PID" -o ppid=`
+                echo_failure
+                echo "starting ${SHORTNAME} services (already running : $PARENTPID,$PID) "
+                exit 1
+            fi
+        fi
+    fi
+ 
+    echo -n "starting ${SHORTNAME} services"
+    $DAEMON_HOME/bin/jsvc \
+    -user $TOMCAT_USER \
+    -home $JAVA_HOME \
+    -Dcatalina.home=$CATALINA_HOME \
+    -Dcatalina.tmpdir=$CATALINA_TMPDIR \
+    -Djava.io.tmpdir=$CATALINA_TMPDIR \
+    -wait 10 \
+    -pidfile $PIDFILE \
+    -outfile $CATALINA_HOME/logs/catalina.out \
+    -errfile '&1' \
+    $CATALINA_OPTS \
+    -Xms64M -Xmx1024M \
+    -cp $CLASSPATH \
+    org.apache.catalina.startup.Bootstrap \
+    chown -R -H --dreference tomcat:tomcat $CATALINA_HOME/*
+    if [ -f "$PIDFILE" ] ; then
+        PID=`cat "$PIDFILE"`
+        echo -n " ( $PID )"
+        echo_success
+        echo
+    else
+        echo_failure
+        echo
+    fi
+}
+ 
+restart() {
+    #
+    # Restart Tomcat
+    #
+    stop
+    start
+}
+ 
+case "$1" in
+    start)
+        start
+        ;;
+    stop)
+        stop
+        ;;
+    restart|reload|force-reload)
+        restart
+        ;;
+    status)
+        rhstatus
+        ;;
+    *)
+        echo "Usage: $0 {start|stop|restart|reload|force-reload|status}"
+        exit 1;;
+esac
+

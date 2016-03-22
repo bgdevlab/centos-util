@@ -1,0 +1,69 @@
+#!/bin/bash
+#
+# chkconfig: 345 99 01
+# description: Message queue
+#
+PROG=activemq
+PROG_USER=activemq
+DAEMON_HOME=/home/activemq/apache-activemq-5.2.0
+DAEMON=$DAEMON_HOME/bin/$PROG
+LOCKFILE=/var/lock/subsys/$PROG
+PIDFILE=$DAEMON_HOME/bin/$PROG.pid
+ 
+test -x $DAEMON || exit 0
+ 
+# Source function library.
+. /etc/rc.d/init.d/functions
+ 
+RETVAL=0
+ 
+usage () {
+    echo "Usage: service $PROG {start|stop|restart|status}"
+    RETVAL=1
+}
+ 
+start () {
+        echo -n $"Starting $PROG: "
+        if [ ! -e $LOCKFILE ]; then
+                cd $DAEMON_HOME
+                su $PROG_USER -c "ACTIVEMQ_PID=$PIDFILE $DAEMON > >(logger -t $PROG) 2>&1 &"
+        else
+                echo -n "Lockfile exists"
+                false
+        fi
+        RETVAL=$?
+        if [ $RETVAL -eq 0 ]; then
+                logger -t activemq "starting $PROG."
+                touch $LOCKFILE
+        else
+                logger -t activemq "unable to start $PROG."
+        fi
+        [ $RETVAL -eq 0 ] && success $"$PROG startup" || failure $"$PROG
+startup"
+        echo
+}
+ 
+stop () {
+        echo -n "Shutting down $PROG: "
+        killproc -p $PIDFILE -d 20
+        RETVAL=$?
+        echo
+        [ $RETVAL = 0 ] && rm -f $LOCKFILE
+}
+ 
+case "$1" in
+    start) start ;;
+    stop) stop ;;
+    restart|reload)
+        stop
+        start
+        ;;
+    status)
+        status -p $PIDFILE
+        RETVAL=$?
+       ;;
+    *) usage ;;
+esac
+ 
+exit $RETVAL
+
