@@ -1,16 +1,17 @@
 # centos-util
 CentOS utlity and build scripts, OS version 5.
 
-| Release     | Branch    | CentOS Version  |
-| ----------- | --------- | --------------- |
-| 1.0         | os/5      | CentOS 5.x      |
-| 2.0         | master    | CentOS 6.x      |
+| Release     | Branch    | CentOS Version   |
+| ----------- | --------- | ---------------- |
+| 1.0         | os/5      | CentOS 5.x       |
+|             | master    | CentOS 6.x / 7.x |
 
 ## Packages
 
  - apache/activemq
  - apache/tomcat
- 
+ - oracle/jdk
+
 ## ActiveMQ
 
  To install __apache-activemq 5.10__ and tidy up post install. 
