@@ -15,8 +15,10 @@ lognow(){
     echo "$tstamp,$ident,$message" | tee -a $logfile
 }
 
-installActiveMQ510() {
-    amqv=5.10
+
+
+installActiveMQ513() {
+    amqv=5.13
     /usr/sbin/useradd activemq
     chown -R activemq:activemq /home/activemq
     chmod -R 755 /home/activemq
@@ -25,7 +27,7 @@ installActiveMQ510() {
     # ACTIVEMQ
     lognow "install activemq-$amqv application"
 
-    dist_activemq="http://apache.uberglobalmirror.com/activemq/5.10.2/apache-activemq-5.10.2-bin.tar.gz"
+    dist_activemq="https://archive.apache.org/dist/activemq/5.13.2/apache-activemq-5.13.2-bin.tar.gz"
     init_activemq="${script_baseurl}/scripts/apache/activemq/apache-activemq-5.10.2-bin.init"
 
     dist_archive=`basename "$dist_activemq"`
@@ -37,6 +39,59 @@ installActiveMQ510() {
     else
         lognow "found local archive $dist_archive"
     fi
+    file "${dist_archive}" | grep 'gzip compressed data' || { echo "${dist_archive} appears invalid - possibly failed download, remove it and try again.";exit -1; }
+
+    lognow "checking for local $init_script file (this may have been copied here by PACKER)"
+    if [ ! -f $init_script ]; then
+        curl --silent --show-error -O $init_activemq 2>/dev/null
+    else
+        lognow "found local archive $init_script"
+    fi
+
+    lognow "extracting activemq "
+    tar -xf "$dist_archive" -C /home/activemq/ 2>>$errlogfile
+
+    cp -f "$init_script" /etc/init.d/activemq
+    chmod 755 /etc/init.d/activemq
+    #/sbin/chkconfig activemq on -- chkconfig not supported  (actually can be fixed with approparite/compliant headers in activemq init.d file)
+
+    lognow "generate activemq config"
+    /etc/init.d/activemq setup /etc/default/activemq
+
+    /sbin/service activemq restart
+
+    chown -R activemq:activemq /home/activemq
+    chmod -R 755 /home/activemq
+
+    /sbin/chkconfig --add activemq
+    /sbin/chkconfig activemq on
+}
+
+
+
+installActiveMQ510() {
+    amqv=5.10
+    /usr/sbin/useradd activemq
+    chown -R activemq:activemq /home/activemq
+    chmod -R 755 /home/activemq
+
+    # Requires JAVA6 to be installed.
+    # ACTIVEMQ
+    lognow "install activemq-$amqv application"
+
+    dist_activemq="http://archive.apache.org/dist/activemq/5.10.2/apache-activemq-5.10.2-bin.tar.gz"
+    init_activemq="${script_baseurl}/scripts/apache/activemq/apache-activemq-5.10.2-bin.init"
+
+    dist_archive=`basename "$dist_activemq"`
+    init_script=`basename "$init_activemq"`
+
+    lognow "checking for local $dist_archive file (this may have been copied here by PACKER)"
+    if [ ! -f $dist_archive ]; then
+        curl --silent --show-error -O $dist_activemq 2>/dev/null
+    else
+        lognow "found local archive $dist_archive"
+    fi
+    file "${dist_archive}" | grep 'gzip compressed data' || { echo "${dist_archive} appears invalid - possibly failed download, remove it and try again.";exit -1; }
 
     lognow "checking for local $init_script file (this may have been copied here by PACKER)"
     if [ ! -f $init_script ]; then
@@ -76,7 +131,7 @@ installActiveMQ58() {
     # ACTIVEMQ
     lognow "install activemq-$amqv application"
 
-    dist_activemq="http://archive.apache.org/dist/activemq/apache-activemq/5.8.0/apache-activemq-5.8.0-bin.tar.gz"
+    dist_activemq="https://archive.apache.org/dist/activemq/apache-activemq/5.8.0/apache-activemq-5.8.0-bin.tar.gz"
     init_activemq="${script_baseurl}/scripts/apache/activemq/apache-activemq-5.8.0-bin.init"
 
     dist_archive=`basename "$dist_activemq"`
@@ -88,6 +143,7 @@ installActiveMQ58() {
     else
         lognow "found local archive $dist_archive"
     fi
+    file "${dist_archive}" | grep 'gzip compressed data' || { echo "${dist_archive} appears invalid - possibly failed download, remove it and try again.";exit -1; }
 
     lognow "checking for local $init_script file (this may have been copied here by PACKER)"
     if [ ! -f $init_script ]; then
@@ -128,7 +184,7 @@ installActiveMQ52() {
     lognow "install activemq-$amq application"
 
 
-    dist_activemq="http://archive.apache.org/dist/activemq/apache-activemq/5.2.0/apache-activemq-5.2.0-bin.tar.gz"
+    dist_activemq="https://archive.apache.org/dist/activemq/apache-activemq/5.2.0/apache-activemq-5.2.0-bin.tar.gz"
     init_activemq="${script_baseurl}/scripts/apache/activemq/apache-activemq-5.2.0.init"
     
     dist_archive=`basename "$dist_activemq"`
@@ -140,6 +196,7 @@ installActiveMQ52() {
     else
         lognow "found local archive $dist_archive"        
     fi
+    file "${dist_archive}" | grep 'gzip compressed data' || { echo "${dist_archive} appears invalid - possibly failed download, remove it and try again.";exit -1; }
 
     lognow "checking for local $init_script file (this may have been copied here by PACKER)"
     if [ ! -f $init_script ]; then
@@ -178,7 +235,7 @@ usage() {
     cat << USAGE 
 This script can install different AMQ.
 The script relies on 2 environment variables, AMQ_ACTION  and AMQ_VERSION, they both MUST be set for the script to work.
-  AMQ_VERSION - [ amq52 | amq58 | amq510]
+  AMQ_VERSION - [ amq52 | amq58 | amq510 | amq513 ]
   AMQ_ACTION  - [ info | install | clean ]
   
 Command line argument override these environment variables, the order in ACTION VERSION  
@@ -221,6 +278,11 @@ if [ "$serviceAction" == "info" ]; then
 
     lognow "show activemq versions `ls /home/activemq/ | sed 's/apache-activemq-//'`"
     exit 0
+
+elif [ "$serviceVersion" == "amq513" ] && [ "$serviceAction" == "install" ]; then
+
+    lognow "install activemq 5.13"
+    installActiveMQ513
 
 elif [ "$serviceVersion" == "amq510" ] && [ "$serviceAction" == "install" ]; then
 

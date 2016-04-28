@@ -37,6 +37,7 @@ installTomcat() {
     else
         lognow "found local archive $dist_archive"
     fi
+    file "${dist_archive}" | grep 'gzip compressed data' || { echo "${dist_archive} appears invalid - possibly failed download, remove it and try again.";exit -1; }
 
     lognow "checking for local $init_script file"
     if [ ! -f $init_script ]; then
