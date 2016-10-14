@@ -3,7 +3,7 @@
 
 function download_install_jdk() {
     # get the Oracle JDK
-    time curl https://gist.githubusercontent.com/theodson/ed84e9c80c97ca8af53a/raw/adc9c8188cadd7baff126a329d18858953294ab9/getOracleJDK.sh | bash -s "rpm" "6" 2>/dev/null \
+    time curl https://gist.githubusercontent.com/bgdevlab/e29b5c07242d7d874982c5d20f98de5b/raw/adc9c8188cadd7baff126a329d18858953294ab9/getOracleJDK.sh | bash -s "rpm" "6" 2>/dev/null \
         && echo "Download JDK6 complete" \
         && chmod +x jdk-6u*-linux-x64*rpm* \
         && sudo ./jdk-6u*-linux-x64*rpm.bin
